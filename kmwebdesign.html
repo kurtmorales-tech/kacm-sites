@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kmwebdesign | Immersive 3D Web Design & Creative Coding Experiences</title>
+
+    <!-- SEO Optimization -->
+    <meta name="description" content="Kmwebdesign, led by Kurt Anthony Morales, specializes in crafting future digital experiences, immersive 3D websites, WebGL, and next-generation UI/UX design.">
+    <meta name="keywords" content="3D Web Design, WebGL, Three.js, Creative Coding, Immersive Website, UI/UX, Motion Graphics, Kmwebdesign, Kurt Anthony Morales, Next-Gen Web">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght(300,500,700);family=Syncopate(400,700);display=swap" rel="stylesheet">
+
+    <!-- GSAP for DOM Animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <style>
+        :root {
+            --color-bg: #030305;
+            --color-primary: #00f3ff;
+            --color-secondary: #ff0055;
+            --font-display: 'Syncopate', sans-serif;
+            --font-body: 'Outfit', sans-serif;
+        }
+
+        body {
+            margin: 0;
+            overflow-x: hidden;
+            background-color: var(--color-bg);
+            color: white;
+            font-family: var(--font-body);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            outline: none;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--color-bg);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--color-primary);
+        }
+
+        /* Typography & Effects */
+        .font-display {
+            font-family: var(--font-display);
+        }
+
+        .neon-text-cyan {
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.5), 0 0 20px rgba(0, 243, 255, 0.3);
+        }
+
+        .neon-text-pink {
+            text-shadow: 0 0 10px rgba(255, 0, 85, 0.5), 0 0 20px rgba(255, 0, 85, 0.3);
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* Glitch Animation for Logo */
+        .glitch-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+        .glitch-wrapper::before, .glitch-wrapper::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--color-bg);
+        }
+        .glitch-wrapper::before {
+            left: 2px;
+            text-shadow: -1px 0 var(--color-secondary);
+            clip: rect(24px, 550px, 90px, 0);
+            animation: glitch-anim-2 3s infinite linear alternate-reverse;
+        }
+        .glitch-wrapper::after {
+            left: -2px;
+            text-shadow: -1px 0 var(--color-primary);
+            clip: rect(85px, 550px, 140px, 0);
+            animation: glitch-anim 2.5s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-anim {
+            0% { clip: rect(11px, 9999px, 89px, 0); }
+            20% { clip: rect(88px, 9999px, 12px, 0); }
+            40% { clip: rect(33px, 9999px, 9px, 0); }
+            60% { clip: rect(66px, 9999px, 44px, 0); }
+            80% { clip: rect(10px, 9999px, 88px, 0); }
+            100% { clip: rect(55px, 9999px, 22px, 0); }
+        }
+        @keyframes glitch-anim-2 {
+            0% { clip: rect(89px, 9999px, 11px, 0); }
+            20% { clip: rect(12px, 9999px, 88px, 0); }
+            40% { clip: rect(9px, 9999px, 33px, 0); }
+            60% { clip: rect(44px, 9999px, 66px, 0); }
+            80% { clip: rect(88px, 9999px, 10px, 0); }
+            100% { clip: rect(22px, 9999px, 55px, 0); }
+        }
+
+        /* Loader */
+        #loader {
+            position: fixed;
+            inset: 0;
+            background: var(--color-bg);
+            z-index: 50;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.5s ease;
+        }
+        .loader-bar {
+            width: 0%;
+            height: 2px;
+            background: var(--color-primary);
+            transition: width 0.2s;
+            box-shadow: 0 0 10px var(--color-primary);
+        }
+
+        .testimonial-quote {
+            position: relative;
+            padding-left: 1.5rem;
+        }
+
+        .testimonial-quote::before {
+            content: "“";
+            position: absolute;
+            left: 0;
+            top: -0.5rem;
+            font-size: 3rem;
+            line-height: 1;
+            color: var(--color-secondary);
+            opacity: 0.5;
+            font-family: serif;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Loading Screen -->
+    <div id="loader">
+        <div class="w-64">
+            <div class="font-display text-sm mb-2 text-cyan-400 tracking-widest text-center">INITIALIZING CORE...</div>
+            <div class="w-full bg-gray-900 h-1 rounded-full overflow-hidden">
+                <div class="loader-bar" id="progress-bar"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-40 px-6 py-4 flex justify-between items-center mix-blend-difference text-white">
+        <a href="#" class="font-display font-bold text-xl tracking-wider hover:text-cyan-400 transition-colors">
+            KM<span class="text-cyan-400">WD</span>
+        </a>
+
+        <div class="hidden md:flex gap-8 text-sm font-medium tracking-wide">
+            <a href="#about" class="hover:text-cyan-400 transition-colors relative group">
+                ABOUT
+                <span class="absolute -bottom-1 left-0 w-0 h-[1px] bg-cyan-400 transition-all group-hover:w-full"></span>
+            </a>
+            <a href="#services" class="hover:text-pink-500 transition-colors relative group">
+                SERVICES
+                <span class="absolute -bottom-1 left-0 w-0 h-[1px] bg-pink-500 transition-all group-hover:w-full"></span>
+            </a>
+            <a href="#work" class="hover:text-cyan-400 transition-colors relative group">
+                WORK
+                <span class="absolute -bottom-1 left-0 w-0 h-[1px] bg-cyan-400 transition-all group-hover:w-full"></span>
+            </a>
+            <a href="#testimonials" class="hover:text-pink-500 transition-colors relative group">
+                TESTIMONIALS
+                <span class="absolute -bottom-1 left-0 w-0 h-[1px] bg-pink-500 transition-all group-hover:w-full"></span>
+            </a>
+        </div>
+
+        <button onclick="document.getElementById('contact').scrollIntoView({behavior: 'smooth'})"
+                class="hidden md:block px-6 py-2 border border-white/20 hover:border-cyan-400 hover:bg-cyan-400/10 hover:text-cyan-400 transition-all text-xs font-bold tracking-widest uppercase rounded-sm">
+            Start Project
+        </button>
+
+        <!-- Mobile Menu Button -->
+        <button class="md:hidden text-2xl">
+            ☰
+        </button>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="relative z-10">
+
+        <!-- Hero Section -->
+        <section class="h-screen w-full flex items-center justify-start px-6 md:px-20 relative" id="home">
+            <div class="max-w-4xl relative pointer-events-none">
+                <h2 class="text-cyan-400 font-display tracking-[0.2em] text-sm mb-4 animate-fade-in-up">WELCOME TO THE FUTURE</h2>
+                <h1 class="text-5xl md:text-8xl font-bold font-display leading-tight mb-6">
+                    <span class="glitch-wrapper" data-text="DESIGN">DESIGN</span><br>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-600 neon-text-cyan">BEYOND</span><br>
+                    REALITY
+                </h1>
+                <p class="text-gray-400 max-w-md text-lg mb-8 leading-relaxed glass-panel p-4 rounded-r-xl border-l-4 border-cyan-400 pointer-events-auto">
+                    Kmwebdesign crafts immersive digital experiences using cutting-edge 3D technology (WebGL, Three.js) and motion graphics.
+                </p>
+                <div class="flex gap-4 pointer-events-auto">
+                    <button class="bg-white text-black px-8 py-3 font-bold hover:bg-cyan-400 hover:scale-105 transition-all duration-300">
+                        EXPLORE
+                    </button>
+                    <button class="border border-white/30 px-8 py-3 font-bold hover:bg-white/10 transition-all duration-300 backdrop-blur-sm">
+                        SHOWREEL
+                    </button>
+                </div>
+            </div>
+
+            <!-- Scroll Indicator -->
+            <div class="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-50 animate-bounce">
+                <span class="text-[10px] tracking-widest uppercase">Scroll</span>
+                <div class="w-[1px] h-10 bg-gradient-to-b from-cyan-400 to-transparent"></div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about" class="min-h-screen py-20 px-6 md:px-20 flex flex-col md:flex-row items-center gap-12 bg-black/20 backdrop-blur-sm">
+            <div class="w-full md:w-1/2">
+                <!-- 3D placeholder area, content is aligned left to allow 3D scene visibility on right -->
+            </div>
+            <div class="w-full md:w-1/2 text-right">
+                <h2 class="text-4xl md:text-6xl font-display font-bold mb-6">Meet the <span class="text-pink-500">Founder</span></h2>
+                <h3 class="text-2xl font-display font-bold text-cyan-400 mb-4">Kurt Anthony Morales</h3>
+                <p class="text-xl text-gray-300 leading-relaxed mb-6">
+                    I am the Owner and Lead Web Designer behind Kmwebdesign. As a collective, we focus on digital artistry, creative coding, and 3D specialization. We don't just build websites; we build worlds that provide next-generation UI/UX experiences.
+                </p>
+                <div class="grid grid-cols-2 gap-4 text-left mt-8">
+                    <div class="glass-panel p-6 border-t-2 border-pink-500">
+                        <h3 class="text-2xl font-bold font-display text-white mb-2">50+</h3>
+                        <p class="text-sm text-gray-400">Awards Won</p>
+                    </div>
+                    <div class="glass-panel p-6 border-t-2 border-cyan-400">
+                        <h3 class="text-2xl font-bold font-display text-white mb-2">100+</h3>
+                        <p class="text-sm text-gray-400">Projects Launched</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Services Section -->
+        <section id="services" class="min-h-screen py-20 px-6 md:px-20 relative">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-6xl font-display font-bold">Our <span class="text-cyan-400">Services</span></h2>
+                <div class="w-24 h-1 bg-gradient-to-r from-cyan-400 to-pink-500 mx-auto mt-4"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto">
+                <!-- Service Card 1 -->
+                <div class="glass-panel p-8 group hover:bg-white/5 transition-all duration-500 hover:-translate-y-2 border border-white/5 hover:border-cyan-400/50">
+                    <div class="h-16 w-16 bg-cyan-500/10 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <svg class="w-8 h-8 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4 font-display">WebGL Experiences</h3>
+                    <p class="text-gray-400">Custom 3D shaders, particle systems, and fluid simulations that run directly in the browser using Three.js.</p>
+                </div>
+
+                <!-- Service Card 2 -->
+                <div class="glass-panel p-8 group hover:bg-white/5 transition-all duration-500 hover:-translate-y-2 border border-white/5 hover:border-pink-500/50">
+                    <div class="h-16 w-16 bg-pink-500/10 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <svg class="w-8 h-8 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4 font-display">UI/UX Design</h3>
+                    <p class="text-gray-400">Futuristic interfaces grounded in solid usability principles. We design for the user of tomorrow, focusing on accessibility and immersive presentation.</p>
+                </div>
+
+                <!-- Service Card 3 -->
+                <div class="glass-panel p-8 group hover:bg-white/5 transition-all duration-500 hover:-translate-y-2 border border-white/5 hover:border-cyan-400/50">
+                    <div class="h-16 w-16 bg-cyan-500/10 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                        <svg class="w-8 h-8 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4 font-display">Creative Coding</h3>
+                    <p class="text-gray-400">Generative art, interactive installations, and advanced algorithmic animations using libraries like GSAP and Three.js.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Work/Portfolio Section -->
+        <section id="work" class="min-h-screen py-20 px-6 md:px-20 relative bg-black/40 backdrop-blur-sm">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-6xl font-display font-bold">Featured <span class="text-pink-500">Work</span></h2>
+                <div class="w-24 h-1 bg-gradient-to-r from-pink-500 to-cyan-400 mx-auto mt-4"></div>
+                <p class="mt-4 text-gray-400 max-w-2xl mx-auto">A glimpse into our most complex and visually demanding digital creations, pushing the boundaries of WebGL and creative development.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+                <!-- Project Card 1: Kinetic Data Viz -->
+                <div class="glass-panel p-6 rounded-xl group hover:scale-[1.02] transition-transform duration-300 border-l-4 border-cyan-400">
+                    <a href="#" class="block">
+                        <img src="https://placehold.co/600x400/00f3ff/030305/png?text=DATA+VISUALIZATION+UI"
+                             alt="Project KRONOS Thumbnail"
+                             class="h-40 w-full object-cover rounded-lg mb-4 opacity-80 group-hover:opacity-100 transition-opacity">
+                    </a>
+                    <h3 class="text-xl font-bold font-display mb-1 text-cyan-400">Project KRONOS</h3>
+                    <p class="text-sm text-gray-400 mb-4">Interactive data visualization built with Three.js and custom GLSL shaders for real-time data analysis.</p>
+                    <span class="text-xs uppercase tracking-wider bg-cyan-400/20 text-cyan-200 px-2 py-1 rounded-full">WebGL</span>
+                    <span class="text-xs uppercase tracking-wider bg-cyan-400/20 text-cyan-200 px-2 py-1 rounded-full ml-2">Data Viz</span>
+                </div>
+
+                <!-- Project Card 2: E-Commerce Experience -->
+                <div class="glass-panel p-6 rounded-xl group hover:scale-[1.02] transition-transform duration-300 border-l-4 border-pink-500">
+                    <a href="#" class="block">
+                        <img src="https://placehold.co/600x400/ff0055/030305/png?text=3D+PRODUCT+RENDER"
+                             alt="Project NEXUS Thumbnail"
+                             class="h-40 w-full object-cover rounded-lg mb-4 opacity-80 group-hover:opacity-100 transition-opacity">
+                    </a>
+                    <h3 class="text-xl font-bold font-display mb-1 text-pink-500">Project NEXUS</h3>
+                    <p class="text-sm text-gray-400 mb-4">A high-fidelity e-commerce product experience featuring a 360° interactive view and material customization.</p>
+                    <span class="text-xs uppercase tracking-wider bg-pink-500/20 text-pink-200 px-2 py-1 rounded-full">3D E-Commerce</span>
+                    <span class="text-xs uppercase tracking-wider bg-pink-500/20 text-pink-200 px-2 py-1 rounded-full ml-2">UI/UX</span>
+                </div>
+
+                <!-- Project Card 3: Generative Art Landing Page -->
+                <div class="glass-panel p-6 rounded-xl group hover:scale-[1.02] transition-transform duration-300 border-l-4 border-cyan-400">
+                    <a href="#" class="block">
+                        <img src="https://placehold.co/600x400/00f3ff/030305/png?text=GENERATIVE+LANDING+PAGE"
+                             alt="Project AURORA Thumbnail"
+                             class="h-40 w-full object-cover rounded-lg mb-4 opacity-80 group-hover:opacity-100 transition-opacity">
+                    </a>
+                    <h3 class="text-xl font-bold font-display mb-1 text-cyan-400">Project AURORA</h3>
+                    <p class="text-sm text-gray-400 mb-4">A creative coding marketing site with a unique, ever-changing generative background system.</p>
+                    <span class="text-xs uppercase tracking-wider bg-cyan-400/20 text-cyan-200 px-2 py-1 rounded-full">Generative Art</span>
+                    <span class="text-xs uppercase tracking-wider bg-cyan-400/20 text-cyan-200 px-2 py-1 rounded-full ml-2">GSAP Motion</span>
+                </div>
+            </div>
+
+            <div class="text-center mt-12">
+                <button class="px-8 py-3 border border-white/20 text-white font-bold tracking-widest hover:border-pink-500 hover:bg-pink-500/10 transition-all uppercase">
+                    View Complete Case Studies
+                </button>
+            </div>
+        </section>
+
+        <!-- Testimonials Section (NEW) -->
+        <section id="testimonials" class="py-20 px-6 md:px-20 relative">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-6xl font-display font-bold">Client <span class="text-cyan-400">Validation</span></h2>
+                <div class="w-24 h-1 bg-gradient-to-r from-cyan-400 to-pink-500 mx-auto mt-4"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto">
+
+                <!-- Testimonial 1 -->
+                <div class="glass-panel p-8 rounded-xl border-b-4 border-cyan-400 flex flex-col justify-between">
+                    <p class="text-lg text-gray-300 italic mb-6 testimonial-quote">
+                        "Kmwebdesign took our brand identity and elevated it into a digital experience that feels like science fiction. The 3D integration is flawless and highly performant."
+                    </p>
+                    <div>
+                        <p class="font-bold text-cyan-400 font-display">SARA JENKINS</p>
+                        <p class="text-sm text-gray-500">CEO, Digital Frontier Corp.</p>
+                    </div>
+                </div>
+
+                <!-- Testimonial 2 -->
+                <div class="glass-panel p-8 rounded-xl border-b-4 border-pink-500 flex flex-col justify-between">
+                    <p class="text-lg text-gray-300 italic mb-6 testimonial-quote">
+                        "The level of creative coding and attention to motion graphics detail is unmatched. They delivered a website that is essentially a generative art installation."
+                    </p>
+                    <div>
+                        <p class="font-bold text-pink-500 font-display">MARCUS 'MAC' EVANS</p>
+                        <p class="text-sm text-gray-500">Founder, Aether Tech</p>
+                    </div>
+                </div>
+
+                <!-- Testimonial 3 -->
+                <div class="glass-panel p-8 rounded-xl border-b-4 border-cyan-400 flex flex-col justify-between">
+                    <p class="text-lg text-gray-300 italic mb-6 testimonial-quote">
+                        "Beyond the aesthetics, the site is fast, responsive, and incredibly intuitive. A true masterclass in futuristic UI/UX design."
+                    </p>
+                    <div>
+                        <p class="font-bold text-cyan-400 font-display">DR. LI WEI</p>
+                        <p class="text-sm text-gray-500">Head of R&D, Nova Labs</p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+
+        <!-- Contact Section -->
+        <section id="contact" class="min-h-screen flex items-center justify-center px-6 py-20 relative overflow-hidden">
+            <!-- Background gradient splash -->
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-pink-500/20 blur-[100px] rounded-full -z-10"></div>
+
+            <div class="w-full max-w-2xl glass-panel p-8 md:p-12 rounded-xl relative">
+                <div class="absolute -top-6 -left-6 w-12 h-12 border-t-4 border-l-4 border-cyan-400"></div>
+                <div class="absolute -bottom-6 -right-6 w-12 h-12 border-b-4 border-r-4 border-pink-500"></div>
+
+                <h2 class="text-3xl md:text-5xl font-display font-bold mb-2 text-center">Start a Project</h2>
+                <p class="text-center text-gray-400 mb-8">Let's build something impossible together.</p>
+
+                <form onsubmit="event.preventDefault();" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <label class="text-xs uppercase tracking-widest text-cyan-400">Name</label>
+                            <input type="text" class="w-full bg-black/50 border border-white/10 p-3 text-white focus:border-cyan-400 focus:outline-none transition-colors" placeholder="John Doe">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-xs uppercase tracking-widest text-pink-500">Email</label>
+                            <input type="email" class="w-full bg-black/50 border border-white/10 p-3 text-white focus:border-pink-500 focus:outline-none transition-colors" placeholder="john@example.com">
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-xs uppercase tracking-widest text-gray-400">Message</label>
+                        <textarea rows="4" class="w-full bg-black/50 border border-white/10 p-3 text-white focus:border-cyan-400 focus:outline-none transition-colors" placeholder="Tell us about your vision..."></textarea>
+                    </div>
+                    <button class="w-full py-4 bg-gradient-to-r from-cyan-500 to-blue-600 font-bold tracking-widest hover:brightness-110 transition-all text-black mt-4 uppercase">
+                        Initialize Contact
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="py-12 border-t border-white/10 bg-black relative z-10">
+            <div class="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
+                <div class="text-2xl font-display font-bold tracking-wider">
+                    KM<span class="text-cyan-400">WD</span>
+                </div>
+                <div class="text-gray-500 text-sm">
+                    &copy; 2024 Kmwebdesign Studio, founded by Kurt Anthony Morales. All systems nominal.
+                </div>
+                <div class="flex gap-6">
+                    <a href="#" class="text-gray-400 hover:text-cyan-400 transition-colors">Instagram</a>
+                    <a href="#" class="text-gray-400 hover:text-cyan-400 transition-colors">Twitter</a>
+                    <a href="#" class="text-gray-400 hover:text-cyan-400 transition-colors">LinkedIn</a>
+                </div>
+            </div>
+        </footer>
+
+    </main>
+
+    <!-- 3D Scripts -->
+    <!-- Using Modules for Three.js -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+        import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+        import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+        import { FilmPass } from 'three/addons/postprocessing/FilmPass.js';
+
+        // --- Configuration & Constants ---
+        const CONFIG = {
+            colors: {
+                bg: 0x030305,
+                primary: 0x00f3ff,
+                secondary: 0xff0055,
+                tertiary: 0x6e00ff
+            },
+            bloom: {
+                strength: 1.5,
+                radius: 0.4,
+                threshold: 0
+            }
+        };
+
+        // --- Application State ---
+        const state = {
+            mouseX: 0,
+            mouseY: 0,
+            targetRotationX: 0,
+            targetRotationY: 0,
+            scrollY: 0
+        };
+
+        // --- Class: The 3D World ---
+        class World {
+            constructor() {
+                this.container = document.createElement('canvas');
+                this.container.id = 'bg-canvas';
+                document.body.prepend(this.container);
+
+                this.scene = new THREE.Scene();
+                this.scene.fog = new THREE.FogExp2(CONFIG.colors.bg, 0.02);
+
+                this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                this.camera.position.z = 5;
+
+                this.renderer = new THREE.WebGLRenderer({
+                    canvas: this.container,
+                    antialias: false, // Performance optimization for post-processing
+                    powerPreference: "high-performance",
+                    alpha: false
+                });
+                this.renderer.setSize(window.innerWidth, window.innerHeight);
+                this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+                this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+                this.renderer.toneMappingExposure = 1.2;
+
+                // Groups for animation
+                this.heroGroup = new THREE.Group();
+                this.scene.add(this.heroGroup);
+
+                this.particlesGroup = new THREE.Group();
+                this.scene.add(this.particlesGroup);
+
+                this.initLights();
+                this.initObjects();
+                this.initPostProcessing();
+                this.addEventListeners();
+
+                this.clock = new THREE.Clock();
+                this.animate();
+
+                // Remove loader
+                this.removeLoader();
+            }
+
+            initLights() {
+                const ambientLight = new THREE.AmbientLight(0xffffff, 0.1);
+                this.scene.add(ambientLight);
+
+                // Neon Blue Light
+                this.blueLight = new THREE.PointLight(CONFIG.colors.primary, 100, 50);
+                this.blueLight.position.set(2, 2, 2);
+                this.scene.add(this.blueLight);
+
+                // Neon Pink Light
+                this.pinkLight = new THREE.PointLight(CONFIG.colors.secondary, 100, 50);
+                this.pinkLight.position.set(-2, -2, 2);
+                this.scene.add(this.pinkLight);
+            }
+
+            initObjects() {
+                // 1. Central Core (Icosahedron)
+                const geometry = new THREE.IcosahedronGeometry(1, 1);
+                const material = new THREE.MeshPhysicalMaterial({
+                    color: 0x111111,
+                    roughness: 0.2,
+                    metalness: 0.8,
+                    clearcoat: 1.0,
+                    clearcoatRoughness: 0.1,
+                    emissive: CONFIG.colors.tertiary,
+                    emissiveIntensity: 0.2,
+                    wireframe: true
+                });
+                this.core = new THREE.Mesh(geometry, material);
+                this.heroGroup.add(this.core);
+
+                // 2. Inner Glow Sphere
+                const innerGeo = new THREE.IcosahedronGeometry(0.8, 4);
+                const innerMat = new THREE.MeshBasicMaterial({
+                    color: CONFIG.colors.primary,
+                    wireframe: true,
+                    transparent: true,
+                    opacity: 0.1
+                });
+                this.innerCore = new THREE.Mesh(innerGeo, innerMat);
+                this.heroGroup.add(this.innerCore);
+
+                // 3. Floating Rings (Torus)
+                const torusGeo = new THREE.TorusGeometry(2.2, 0.02, 16, 100);
+                const torusMat = new THREE.MeshBasicMaterial({ color: CONFIG.colors.secondary });
+                this.ring = new THREE.Mesh(torusGeo, torusMat);
+                this.ring.rotation.x = Math.PI / 2;
+                this.heroGroup.add(this.ring);
+
+                const torusGeo2 = new THREE.TorusGeometry(1.8, 0.01, 16, 100);
+                const torusMat2 = new THREE.MeshBasicMaterial({ color: CONFIG.colors.primary });
+                this.ring2 = new THREE.Mesh(torusGeo2, torusMat2);
+                this.ring2.rotation.x = Math.PI / 3;
+                this.heroGroup.add(this.ring2);
+
+                // 4. Background Particles
+                const particlesGeometry = new THREE.BufferGeometry();
+                const count = 2000;
+                const posArray = new Float32Array(count * 3);
+
+                for(let i = 0; i < count * 3; i++) {
+                    posArray[i] = (Math.random() - 0.5) * 20; // Spread
+                }
+
+                particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+                const particlesMaterial = new THREE.PointsMaterial({
+                    size: 0.02,
+                    color: CONFIG.colors.primary,
+                    transparent: true,
+                    opacity: 0.8,
+                    blending: THREE.AdditiveBlending
+                });
+
+                this.starField = new THREE.Points(particlesGeometry, particlesMaterial);
+                this.particlesGroup.add(this.starField);
+            }
+
+            initPostProcessing() {
+                this.composer = new EffectComposer(this.renderer);
+                const renderPass = new RenderPass(this.scene, this.camera);
+                this.composer.addPass(renderPass);
+
+                // Bloom
+                const bloomPass = new UnrealBloomPass(
+                    new THREE.Vector2(window.innerWidth, window.innerHeight),
+                    CONFIG.bloom.strength,
+                    CONFIG.bloom.radius,
+                    CONFIG.bloom.threshold
+                );
+                this.composer.addPass(bloomPass);
+
+                // Film/Noise (Subtle texture)
+                const filmPass = new FilmPass(0.35, 0.025, 648, false);
+                this.composer.addPass(filmPass);
+            }
+
+            addEventListeners() {
+                window.addEventListener('resize', this.onWindowResize.bind(this));
+                document.addEventListener('mousemove', this.onMouseMove.bind(this));
+                window.addEventListener('scroll', this.onScroll.bind(this));
+            }
+
+            onWindowResize() {
+                this.camera.aspect = window.innerWidth / window.innerHeight;
+                this.camera.updateProjectionMatrix();
+                this.renderer.setSize(window.innerWidth, window.innerHeight);
+                this.composer.setSize(window.innerWidth, window.innerHeight);
+            }
+
+            onMouseMove(event) {
+                state.mouseX = (event.clientX - window.innerWidth / 2) * 0.001;
+                state.mouseY = (event.clientY - window.innerHeight / 2) * 0.001;
+            }
+
+            onScroll() {
+                state.scrollY = window.scrollY;
+            }
+
+            removeLoader() {
+                const loader = document.getElementById('loader');
+                const bar = document.getElementById('progress-bar');
+
+                // Simulate loading
+                let width = 0;
+                const interval = setInterval(() => {
+                    width += Math.random() * 10;
+                    if (width >= 100) {
+                        width = 100;
+                        clearInterval(interval);
+                        setTimeout(() => {
+                            loader.style.opacity = '0';
+                            setTimeout(() => loader.remove(), 500);
+
+                            // Trigger Intro Animations
+                            this.playIntro();
+                        }, 500);
+                    }
+                    bar.style.width = width + '%';
+                }, 50);
+            }
+
+            playIntro() {
+                // GSAP animation for UI elements
+                gsap.from("nav", { y: -100, duration: 1, ease: "power4.out" });
+                gsap.from(".animate-fade-in-up", { y: 50, opacity: 0, duration: 1, delay: 0.5 });
+            }
+
+            animate() {
+                requestAnimationFrame(this.animate.bind(this));
+
+                const time = this.clock.getElapsedTime();
+
+                // 1. Hero Object Animations
+                this.core.rotation.y += 0.005;
+                this.core.rotation.x += 0.002;
+
+                this.innerCore.rotation.y -= 0.01;
+
+                // Pulsing effect
+                const pulse = 1 + Math.sin(time * 2) * 0.05;
+                this.innerCore.scale.set(pulse, pulse, pulse);
+
+                // Rotate Rings
+                this.ring.rotation.z += 0.01;
+                this.ring.rotation.y = Math.sin(time * 0.5) * 0.2 + (Math.PI / 2);
+                this.ring2.rotation.x += 0.015;
+
+                // 2. Interactive Rotation (Mouse)
+                // Smooth damping
+                state.targetRotationX += (state.mouseX - state.targetRotationX) * 0.05;
+                state.targetRotationY += (state.mouseY - state.targetRotationY) * 0.05;
+
+                this.heroGroup.rotation.y = state.targetRotationX * 5;
+                this.heroGroup.rotation.x = state.targetRotationY * 5;
+
+                // 3. Scroll Interactions (Parallax & Section transitions)
+                // Move camera slightly based on scroll
+                this.camera.position.y = -(state.scrollY * 0.005);
+
+                // Move hero group to the right as we scroll to About section
+                // 1000px scroll creates a shift
+                const scrollProgress = Math.min(state.scrollY / window.innerHeight, 1);
+
+                // Logic: Start at center, move right for "About" section
+                this.heroGroup.position.x = scrollProgress * 2.5;
+                this.heroGroup.position.z = scrollProgress * -1; // Push back slightly
+
+                // 4. Particle Animation
+                this.particlesGroup.rotation.y = time * 0.05;
+
+                // Render
+                this.composer.render();
+            }
+        }
+
+        // --- Initialize ---
+        new World();
+
+        // --- GSAP Scroll Animations ---
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Animate elements as they scroll into view
+        document.querySelectorAll('.glass-panel').forEach((panel) => {
+            gsap.from(panel, {
+                scrollTrigger: {
+                    trigger: panel,
+                    start: "top 85%",
+                    toggleActions: "play none none reverse"
+                },
+                y: 50,
+                opacity: 0,
+                duration: 0.8,
+                ease: "power2.out"
+            });
+        });
+
+    </script>
+</body>
+</html>
